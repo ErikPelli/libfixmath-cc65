@@ -62,8 +62,6 @@ static const fix16_t fix16_eps = 1;          /*!< fix16_t epsilon */
  * These are inlined to allow compiler to optimize away constant numbers
  */
 static inline fix16_t fix16_from_int(int a)     { return a * fix16_one; }
-static inline float   fix16_to_float(fix16_t a) { return (float)a / fix16_one; }
-static inline double  fix16_to_dbl(fix16_t a)   { return (double)a / fix16_one; }
 
 static inline int fix16_to_int(fix16_t a)
 {
@@ -74,25 +72,6 @@ static inline int fix16_to_int(fix16_t a)
 		return (a + (fix16_one >> 1)) / fix16_one;
 	return (a - (fix16_one >> 1)) / fix16_one;
 #endif
-}
-
-static inline fix16_t fix16_from_float(float a)
-{
-	float temp = a * fix16_one;
-#ifndef FIXMATH_NO_ROUNDING
-	temp += (temp >= 0) ? 0.5f : -0.5f;
-#endif
-	return (fix16_t)temp;
-}
-
-static inline fix16_t fix16_from_dbl(double a)
-{
-	double temp = a * fix16_one;
-    /* F16() and F16C() are both rounding allways, so this should as well */
-//#ifndef FIXMATH_NO_ROUNDING
-	temp += (double)((temp >= 0) ? 0.5f : -0.5f);
-//#endif
-	return (fix16_t)temp;
 }
 
 /* Macro for defining fix16_t constant values.
