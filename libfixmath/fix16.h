@@ -36,6 +36,11 @@ extern "C"
 #include <stdint.h>
 #endif
 
+/* cc65 doesn't support explicit inline keyword, we define it here so
+ * the preprocessor can remove it from the code
+ */
+#define inline
+
 typedef int32_t fix16_t;
 
 static const fix16_t FOUR_DIV_PI  = 0x145F3;            /*!< Fix16 value of 4/PI */
