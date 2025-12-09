@@ -25,7 +25,9 @@ extern "C"
  * compatibility with usage of FIXMATH_OPTIMIZE_8BIT.
  */
 #if defined(FIXMATH_OPTIMIZE_8BIT)
-#  define FIXMATH_NO_HARD_DIVISION
+#  ifndef FIXMATH_NO_HARD_DIVISION
+#    define FIXMATH_NO_HARD_DIVISION
+#  endif
 #endif
 
 #ifdef __KERNEL__
