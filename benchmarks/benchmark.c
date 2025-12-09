@@ -1,7 +1,3 @@
-#ifndef NO_FLOAT
-#include <math.h>
-#endif
-
 #include <fix16.h>
 #include "interface.h"
 #include <stdio.h>
@@ -20,9 +16,9 @@ static void cyclecount_update(cyclecount_t *data, uint32_t cycles)
         data->min = cycles;
     if (cycles > data->max)
         data->max = cycles;
-    
+
     data->sum += cycles;
-    data->count++; 
+    data->count++;
 }
 
 #define MEASURE(variable, statement) { \
@@ -37,13 +33,6 @@ static cyclecount_t add_cycles = CYCLECOUNT_INIT;
 static cyclecount_t sub_cycles = CYCLECOUNT_INIT;
 static cyclecount_t div_cycles = CYCLECOUNT_INIT;
 static cyclecount_t mul_cycles = CYCLECOUNT_INIT;
-
-static cyclecount_t float_sqrtf_cycles = CYCLECOUNT_INIT;
-static cyclecount_t float_expf_cycles = CYCLECOUNT_INIT;
-static cyclecount_t float_add_cycles = CYCLECOUNT_INIT;
-static cyclecount_t float_sub_cycles = CYCLECOUNT_INIT;
-static cyclecount_t float_div_cycles = CYCLECOUNT_INIT;
-static cyclecount_t float_mul_cycles = CYCLECOUNT_INIT;
 
 static fix16_t delta(fix16_t result, fix16_t expected)
 {
@@ -73,17 +62,17 @@ int main()
 {
     int i;
     interface_init();
-    
+
     start_timing();
     print_value("Timestamp bias", end_timing());
-    
+
     for (i = 0; i < TESTCASES1_COUNT; i++)
     {
         fix16_t input = testcases1[i].a;
         fix16_t result;
         fix16_t expected = testcases1[i].sqrt;
         MEASURE(sqrt_cycles, result = fix16_sqrt(input));
-        
+
         if (input > 0 && delta(result, expected) > max_delta)
         {
             print_value("Failed SQRT, i", i);
@@ -91,10 +80,10 @@ int main()
             print_value("Failed SQRT, output", result);
             print_value("Failed SQRT, expected", expected);
         }
-        
+
         expected = testcases1[i].exp;
         MEASURE(exp_cycles, result = fix16_exp(input));
-        
+
         if (delta(result, expected) > 400)
         {
             print_value("Failed EXP, i", i);
@@ -109,7 +98,7 @@ int main()
         fix16_t a = testcases2[i].a;
         fix16_t b = testcases2[i].b;
         volatile fix16_t result;
-        
+
         fix16_t expected = testcases2[i].add;
         MEASURE(add_cycles, result = fix16_add(a, b));
         if (delta(result, expected) > max_delta)
@@ -120,7 +109,7 @@ int main()
             print_value("Failed ADD, output", result);
             print_value("Failed ADD, expected", expected);
         }
-        
+
         expected = testcases2[i].sub;
         MEASURE(sub_cycles, result = fix16_sub(a, b));
         if (delta(result, expected) > max_delta)
@@ -131,7 +120,7 @@ int main()
             print_value("Failed SUB, output", result);
             print_value("Failed SUB, expected", expected);
         }
-        
+
         expected = testcases2[i].mul;
         MEASURE(mul_cycles, result = fix16_mul(a, b));
         if (delta(result, expected) > max_delta)
@@ -142,7 +131,7 @@ int main()
             print_value("Failed MUL, output", result);
             print_value("Failed MUL, expected", expected);
         }
-        
+
         if (b != 0)
         {
             expected = testcases2[i].div;
@@ -157,45 +146,13 @@ int main()
             }
         }
     }
-    
-    /* Compare with floating point performance */
-#ifndef NO_FLOAT
-    for (i = 0; i < TESTCASES1_COUNT; i++)
-    {
-        float input = fix16_to_float(testcases1[i].a);
-        volatile float result;
-        MEASURE(float_sqrtf_cycles, result = sqrtf(input));
-        MEASURE(float_expf_cycles, result = expf(input));
-    }
-    
-    for (i = 0; i < TESTCASES2_COUNT; i++)
-    {
-        float a = fix16_to_float(testcases2[i].a);
-        float b = fix16_to_float(testcases2[i].b);
-        volatile float result;
-        MEASURE(float_add_cycles, result = a + b);
-        MEASURE(float_sub_cycles, result = a - b);
-        MEASURE(float_mul_cycles, result = a * b);
-        
-        if (b != 0)
-        {
-            MEASURE(float_div_cycles, result = a / b);
-        }
-    }
-#endif 
 
     print("fix16_sqrt", &sqrt_cycles);
-    print("float sqrtf", &float_sqrtf_cycles);
     print("fix16_exp", &exp_cycles);
-    print("float expf", &float_expf_cycles);
     print("fix16_add", &add_cycles);
-    print("float add", &float_add_cycles);
     print("fix16_sub", &sub_cycles);
-    print("float sub", &float_sub_cycles);
     print("fix16_mul", &mul_cycles);
-    print("float mul", &float_mul_cycles);
     print("fix16_div", &div_cycles);
-    print("float div", &float_div_cycles);
 
     return 0;
 }
